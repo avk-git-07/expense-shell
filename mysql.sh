@@ -53,7 +53,7 @@ else
     echo -e "$Y The MySQL Server is already installed, nothing to do ... $N" | tee -a  $LOG_FILE
 fi
 
-mysql -h mysql.avk07.online -u root -pass ExpenseApp@1 -e 'show databases;' &>> $LOG_FILE
+mysql -h mysql.avk07.online -u root -pExpenseApp@1 -e 'show databases;' &>> $LOG_FILE
 if [ $? -ne 0 ]
 then 
     echo "MySQL root password is not setup, setting now" | tee -a  $LOG_FILE
