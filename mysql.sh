@@ -20,7 +20,7 @@ then
     exit 1
 fi
 
-echo "Script started executing at : $TIMESTAMP" | tee -a  $LOG_FILE
+echo -e "$G Script started executing at : $TIMESTAMP $N" | tee -a  $LOG_FILE
 
 # THIS FUNCTION WILL BE UNTOUCHED UNLESS IT IS CALLED
 VALIDATE() {
@@ -33,14 +33,24 @@ VALIDATE() {
     fi
 }
 
-dnf install mysql-server -y
-VALIDATE $? "Installing mysql server"
+# dnf install mysql-server -y &>> $LOG_FILE
+# VALIDATE $? "Installing mysql server"
 
-systemctl enable mysqld
+dnf list installed mysql-server &>> $LOG_FILE
+    if [ $? -ne 0 ]
+    then 
+        echo "The MySQL Server is not installed, we are going to install it.." | tee -a  $LOG_FILE
+        dnf install mysql-server -y &>> $LOG_FILE
+        VALIDATE $? "installation of MySQL Server" | tee -a  $LOG_FILE
+    else
+        echo -e "$Y The MySQL Server is already installed, nothing to do ... $N" | tee -a  $LOG_FILE
+    fi
+
+systemctl enable mysqld &>> $LOG_FILE
 VALIDATE $? "Enabling mysql server"
 
 systemctl start mysqld
 VALIDATE $? "Starting mysql server"
 
-mysql_secure_installation --set-root-pass ExpenseApp@1
+mysql_secure_installation --set-root-pass ExpenseApp@1 &>> $LOG_FILE
 VALIDATE $? "Setting up root password"
