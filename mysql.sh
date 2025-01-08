@@ -37,22 +37,30 @@ VALIDATE() {
 # VALIDATE $? "Installing mysql server"
 
 dnf list installed mysql-server &>> $LOG_FILE
-    if [ $? -ne 0 ]
-    then 
-        echo "The MySQL Server is not installed, we are going to install it.." | tee -a  $LOG_FILE
-        dnf install mysql-server -y &>> $LOG_FILE
-        VALIDATE $? "installation of MySQL Server" | tee -a  $LOG_FILE
-        
-        systemctl enable mysqld &>> $LOG_FILE
-        VALIDATE $? "Enabling mysql server"
+if [ $? -ne 0 ]
+then 
+    echo "The MySQL Server is not installed, we are going to install it.." | tee -a  $LOG_FILE
+    dnf install mysql-server -y &>> $LOG_FILE
+    VALIDATE $? "installation of MySQL Server" | tee -a  $LOG_FILE
+    
+    systemctl enable mysqld &>> $LOG_FILE
+    VALIDATE $? "Enabling mysql server"
 
-        systemctl start mysqld
-        VALIDATE $? "Starting mysql server"
+    systemctl start mysqld
+    VALIDATE $? "Starting mysql server"
 
-        mysql_secure_installation --set-root-pass ExpenseApp@1 &>> $LOG_FILE
-        VALIDATE $? "Setting up root password"
-    else
-        echo -e "$Y The MySQL Server is already installed, nothing to do ... $N" | tee -a  $LOG_FILE
-    fi
+else
+    echo -e "$Y The MySQL Server is already installed, nothing to do ... $N" | tee -a  $LOG_FILE
+fi
+
+mysql -h mysql.avk07.online -u root -pass ExpenseApp@1 -e 'show databases;' &>> $LOG_FILE
+if [ $? -ne 0 ]
+then 
+    echo "MySQL root password is not setup, setting now" | tee -a  $LOG_FILE
+    mysql_secure_installation --set-root-pass ExpenseApp@1
+    VALIDATE $? "Setting up root password"
+else 
+    echo -e "$G MySQL root password is already setup,.. $Y Skipping.. $N" | tee -a  $LOG_FILE
+fi
 
 
