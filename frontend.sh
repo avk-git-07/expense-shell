@@ -41,10 +41,10 @@ then
     dnf install nginx -y &>>$LOG_FILE
     VALIDATE $? "Installing nginx" | tee -a  $LOG_FILE
 
-    systemctl enable nginx -y &>>$LOG_FILE
+    systemctl enable nginx &>>$LOG_FILE
     VALIDATE $? "Enabling nginx" | tee -a  $LOG_FILE
 
-    systemctl start nginx -y &>>$LOG_FILE
+    systemctl start nginx &>>$LOG_FILE
     VALIDATE $? "Starting nginx" | tee -a  $LOG_FILE
     
 else
