@@ -5,7 +5,7 @@ Description = Backend Service
 User=expense
 Environment=DB_HOST="mysql.avk07.online"
 ExecStart=/bin/node /app/index.js
-SyslogIdentifier=backend
+SyslogIdentifier=back
 
 [Install]
 WantedBy=multi-user.target

@@ -37,7 +37,7 @@ VALIDATE() {
 dnf list installed nodejs &>>$LOG_FILE
 if [ $? -ne 0 ]
 then 
-    echo "The nodejs is not installed, we are going to install it.." | tee -a  $LOG_FILE
+    echo -e "The nodejs is not installed, $G we are going to install it, please wait.. $N" | tee -a  $LOG_FILE
     dnf module disable nodejs -y &>>$LOG_FILE
     VALIDATE $? "Disabling nodejs current version" | tee -a  $LOG_FILE
 
@@ -76,7 +76,7 @@ unzip /tmp/backend.zip &>>$LOG_FILE
 VALIDATE $? "Extracting backend application code" | tee -a  $LOG_FILE
 
 # Installing nodejs dependencies
-npm install &>>$LOG_FILE
+npm install | tee -a $LOG_FILE
 
 # copying backend.service from expense-shell folder to /etc/systemd/system/ directory
 cp /home/ec2-user/expense-shell/backend.service /etc/systemd/system/backend.service
