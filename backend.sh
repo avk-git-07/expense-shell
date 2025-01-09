@@ -33,31 +33,30 @@ VALIDATE() {
     fi
 }
 
-dnf list installed mysql-server &>> $LOG_FILE
+dnf list installed nodejs &>> $LOG_FILE
 if [ $? -ne 0 ]
 then 
-    echo "The MySQL Server is not installed, we are going to install it.." | tee -a  $LOG_FILE
-    dnf install mysql-server -y &>> $LOG_FILE
-    VALIDATE $? "installation of MySQL Server" | tee -a  $LOG_FILE
+    echo "The nodejs is not installed, we are going to install it.." | tee -a  $LOG_FILE
+    dnf module disable nodejs -y &>> $LOG_FILE
+    VALIDATE $? "Disabling nodejs current version" | tee -a  $LOG_FILE
+
+    dnf module enable nodejs:20 -y &>> $LOG_FILE
+    VALIDATE $? "Enabling nodejs:20 version" | tee -a  $LOG_FILE
+
+    dnf install nodejs -y &>> $LOG_FILE
+    VALIDATE $? "Installation of nodejs" | tee -a  $LOG_FILE
     
-    systemctl enable mysqld &>> $LOG_FILE
-    VALIDATE $? "Enabling mysql server"
-
-    systemctl start mysqld
-    VALIDATE $? "Starting mysql server"
-
 else
-    echo -e "$Y The MySQL Server is already installed, nothing to do ... $N" | tee -a  $LOG_FILE
+    echo -e "$Y The nodejs is already installed, nothing to do ... $N" | tee -a  $LOG_FILE
 fi
 
-mysql -h mysql.avk07.online -u root -pExpenseApp@1 -e 'show databases;' &>> $LOG_FILE
+id expense &>> $LOG_FILE
 if [ $? -ne 0 ]
-then 
-    echo "MySQL root password is not setup, setting now" | tee -a  $LOG_FILE
-    mysql_secure_installation --set-root-pass ExpenseApp@1
-    VALIDATE $? "Setting up root password"
-else 
-    echo -e "$G MySQL root password setup already done,.. $Y Skipping.. $N" | tee -a  $LOG_FILE
+then
+    echo -e "The user expense is not yet created, $G so creating now.. $N" | tee -a  $LOG_FILE
+    useradd expense &>> $LOG_FILE
+    VALIDATE $? "Creating expense user" | tee -a  $LOG_FILE
+else
+    echo -e "The user expense is already exists. $G SKIPPING creating the user expense... $N"
 fi
-
 
