@@ -36,15 +36,15 @@ VALIDATE() {
 dnf list installed mysql-server &>> $LOG_FILE
 if [ $? -ne 0 ]
 then 
-    echo "The MySQL Server is not installed, we are going to install it.." | tee -a  $LOG_FILE
+    echo "The MySQL Server is not installed, we are are install now, please wait.." | tee -a  $LOG_FILE
     dnf install mysql-server -y &>> $LOG_FILE
-    VALIDATE $? "installation of MySQL Server" | tee -a  $LOG_FILE
+    VALIDATE $? "Installation of MySQL Server" | tee -a  $LOG_FILE
     
     systemctl enable mysqld &>> $LOG_FILE
-    VALIDATE $? "Enabling mysql server"
+    VALIDATE $? "Enabling mysql server" | tee -a  $LOG_FILE
 
-    systemctl start mysqld
-    VALIDATE $? "Starting mysql server"
+    systemctl start mysqld &>> $LOG_FILE
+    VALIDATE $? "Starting mysql server" | tee -a  $LOG_FILE
 
 else
     echo -e "$Y The MySQL Server is already installed, nothing to do ... $N" | tee -a  $LOG_FILE
@@ -54,8 +54,8 @@ mysql -h mysql.avk07.online -u root -pExpenseApp@1 -e 'show databases;' &>> $LOG
 if [ $? -ne 0 ]
 then 
     echo "MySQL root password is not setup, setting now" | tee -a  $LOG_FILE
-    mysql_secure_installation --set-root-pass ExpenseApp@1
-    VALIDATE $? "Setting up root password"
+    mysql_secure_installation --set-root-pass ExpenseApp@1 &>> $LOG_FILE
+    VALIDATE $? "Setting up root password" | tee -a  $LOG_FILE
 else 
     echo -e "$G MySQL root password setup already done,.. $Y Skipping.. $N" | tee -a  $LOG_FILE
 fi
